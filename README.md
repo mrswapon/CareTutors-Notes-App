@@ -6,21 +6,32 @@ A personal notes manager built with Flutter, Firebase, and Riverpod. Users can r
 
 ## Screenshots
 
-> _Add screenshots to an `assets/screenshots/` folder and update the paths below._
-
-| Splash | Login | Register | Home | Add Note |
-|--------|-------|----------|------|----------|
-| ![Splash](assets/screenshots/splash.png) | ![Login](assets/screenshots/login.png) | ![Register](assets/screenshots/register.png) | ![Home](assets/screenshots/home.png) | ![Add Note](assets/screenshots/add_note.png) |
+<table>
+  <tr>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><b>Register</b></td>
+    <td align="center"><b>Home — Notes List</b></td>
+    <td align="center"><b>Add Note</b></td>
+  </tr>
+  <tr>
+    <td><img src="img_2.png" width="220" alt="Login Screen"/></td>
+    <td><img src="img_3.png" width="220" alt="Register Screen"/></td>
+    <td><img src="img.png"   width="220" alt="Home Screen"/></td>
+    <td><img src="img_1.png" width="220" alt="Add Note Screen"/></td>
+  </tr>
+</table>
 
 ---
 
 ## Features
 
-- **Splash Screen** — Branded animated entry screen shown on first launch
+- **Splash Screen** — Branded animated entry screen with fade & scale animation on first launch
 - **Authentication** — Email & password sign-up and login via Firebase Auth
 - **My Notes** — Real-time list of all personal notes, newest first
 - **Add Note** — Create notes with a title and multiline description
-- **Delete Note** — Long-press any note card to delete with confirmation
+- **Edit Note** — Swipe a card **right** to open it in edit mode
+- **Delete Note** — Swipe a card **left** to delete with confirmation dialog
+- **Beautiful Cards** — Colour-coded cards with letter avatar, word count, and date/time footer
 - **Auto-redirect** — Already logged-in users skip straight to Home; logged-out users are blocked from protected routes
 - **Persistent session** — Firebase Auth persists the user session across app restarts
 
@@ -91,7 +102,7 @@ lib/
 | `authControllerProvider` | `StateNotifierProvider` | Handles `signIn`, `register`, `signOut` with loading & error state |
 | `notesRepositoryProvider` | `Provider` | Singleton `NotesRepository` instance |
 | `notesProvider` | `StreamProvider<List<NoteModel>>` | Real-time Firestore stream for the current user's notes |
-| `notesControllerProvider` | `StateNotifierProvider` | Handles `addNote` and `deleteNote` with loading & error state |
+| `notesControllerProvider` | `StateNotifierProvider` | Handles `addNote`, `updateNote`, and `deleteNote` with loading & error state |
 
 ---
 
@@ -103,28 +114,28 @@ lib/
 | `/login` | `LoginPage` | No |
 | `/register` | `RegisterPage` | No |
 | `/home` | `HomePage` | Yes — redirects to `/login` if signed out |
-| `/add-note` | `AddNotePage` | Yes — redirects to `/login` if signed out |
+| `/add-note` | `AddNotePage` (Add & Edit mode) | Yes — redirects to `/login` if signed out |
 
 ---
 
 ## Firestore Data Model
 
 **`users/{uid}`**
-```
+```json
 {
-  name:      string,
-  email:     string,
-  createdAt: timestamp
+  "name":      "string",
+  "email":     "string",
+  "createdAt": "timestamp"
 }
 ```
 
 **`notes/{noteId}`**
-```
+```json
 {
-  title:       string,
-  description: string,
-  userId:      string,
-  createdAt:   timestamp
+  "title":       "string",
+  "description": "string",
+  "userId":      "string",
+  "createdAt":   "timestamp"
 }
 ```
 
