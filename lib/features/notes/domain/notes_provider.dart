@@ -80,6 +80,29 @@ class NotesController extends StateNotifier<NotesState> {
     }
   }
 
+  Future<bool> updateNote({
+    required String noteId,
+    required String title,
+    required String description,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null, noteSaved: false);
+    try {
+      await _repo.updateNote(
+        noteId: noteId,
+        title: title.trim(),
+        description: description.trim(),
+      );
+      state = state.copyWith(isLoading: false, noteSaved: true);
+      return true;
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to update note. Please try again.',
+      );
+      return false;
+    }
+  }
+
   Future<bool> deleteNote(String noteId) async {
     try {
       await _repo.deleteNote(noteId);

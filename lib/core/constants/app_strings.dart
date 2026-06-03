@@ -25,11 +25,13 @@ class AppStrings {
 
   // Notes
   static const String addNote = 'Add Note';
+  static const String editNote = 'Edit Note';
   static const String noteTitle = 'Title';
   static const String noteTitleHint = 'Enter note title';
   static const String noteDescription = 'Description';
   static const String noteDescriptionHint = 'Write your note here...';
   static const String saveNote = 'Save Note';
+  static const String updateNote = 'Update Note';
   static const String noNotesTitle = 'No notes yet';
   static const String noNotesSubtitle = 'Tap the + button to add your first note';
 
@@ -41,4 +43,5 @@ class AppStrings {
   // Errors
   static const String genericError = 'Something went wrong. Please try again.';
   static const String noteSaved = 'Note saved successfully!';
+  static const String noteUpdated = 'Note updated successfully!';
 }

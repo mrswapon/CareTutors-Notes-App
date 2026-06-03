@@ -28,6 +28,17 @@ class NotesRepository {
     await _firestore.collection('notes').add(note.toMap());
   }
 
+  Future<void> updateNote({
+    required String noteId,
+    required String title,
+    required String description,
+  }) async {
+    await _firestore.collection('notes').doc(noteId).update({
+      'title': title,
+      'description': description,
+    });
+  }
+
   Future<void> deleteNote(String noteId) async {
     await _firestore.collection('notes').doc(noteId).delete();
   }

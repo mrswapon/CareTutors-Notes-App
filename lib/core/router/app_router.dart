@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/domain/auth_provider.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/register_page.dart';
+import '../../features/notes/domain/note_model.dart';
 import '../../features/notes/presentation/add_note_page.dart';
 import '../../features/notes/presentation/home_page.dart';
 import '../../features/splash/presentation/splash_page.dart';
@@ -79,7 +80,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/add-note',
         pageBuilder: (context, state) => _slideTransition(
           key: state.pageKey,
-          child: const AddNotePage(),
+          // extra carries a NoteModel when navigating from edit swipe
+          child: AddNotePage(note: state.extra as NoteModel?),
         ),
       ),
     ],

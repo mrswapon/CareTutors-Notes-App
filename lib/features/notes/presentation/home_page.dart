@@ -51,8 +51,10 @@ class HomePage extends ConsumerWidget {
           return ListView.builder(
             padding: const EdgeInsets.only(top: 8, bottom: 80),
             itemCount: notes.length,
-            itemBuilder: (context, index) =>
-                _NoteCard(note: notes[index], ref: ref),
+            itemBuilder: (context, index) {
+              final note = notes[index];
+              return _SwipeableNoteCard(note: note);
+            },
           );
         },
       ),
@@ -61,76 +63,92 @@ class HomePage extends ConsumerWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Note Card
+// Swipeable wrapper: left = delete, right = edit
 // ---------------------------------------------------------------------------
-class _NoteCard extends StatelessWidget {
-  const _NoteCard({required this.note, required this.ref});
+class _SwipeableNoteCard extends ConsumerWidget {
+  const _SwipeableNoteCard({required this.note});
 
   final NoteModel note;
-  final WidgetRef ref;
 
   @override
-  Widget build(BuildContext context) {
-    final dateFormatted =
-        DateFormat('MMM d, yyyy • h:mm a').format(note.createdAt);
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Dismissible(
+      key: ValueKey(note.id),
+      direction: DismissDirection.horizontal,
 
-    return Card(
-      child: InkWell(
+      // Left swipe reveals red delete background
+      background: _swipeBackground(
+        alignment: Alignment.centerLeft,
+        color: AppColors.primary,
+        icon: Icons.edit_rounded,
+        label: 'Edit',
+      ),
+
+      // Right swipe reveals primary edit background
+      secondaryBackground: _swipeBackground(
+        alignment: Alignment.centerRight,
+        color: AppColors.error,
+        icon: Icons.delete_rounded,
+        label: 'Delete',
+      ),
+
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.endToStart) {
+          // LEFT swipe — delete with confirmation
+          final confirmed = await _showDeleteDialog(context, note.title);
+          if (confirmed == true) {
+            await ref
+                .read(notesControllerProvider.notifier)
+                .deleteNote(note.id);
+            return true;
+          }
+          return false;
+        } else {
+          // RIGHT swipe — open edit page, never dismiss the card
+          if (context.mounted) {
+            context.push('/add-note', extra: note);
+          }
+          return false;
+        }
+      },
+      child: _NoteCard(note: note),
+    );
+  }
+
+  Widget _swipeBackground({
+    required Alignment alignment,
+    required Color color,
+    required IconData icon,
+    required String label,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color,
         borderRadius: BorderRadius.circular(16),
-        onLongPress: () => _confirmDelete(context),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                note.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                note.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.access_time_rounded,
-                    size: 13,
-                    color: AppColors.textHint,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    dateFormatted,
-                    style: GoogleFonts.poppins(
-                      fontSize: 11,
-                      color: AppColors.textHint,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      ),
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.white, size: 26),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  void _confirmDelete(BuildContext context) {
-    showDialog(
+  Future<bool?> _showDeleteDialog(BuildContext context, String title) {
+    return showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -139,22 +157,19 @@ class _NoteCard extends StatelessWidget {
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         content: Text(
-          'Are you sure you want to delete "${note.title}"?',
+          'Are you sure you want to delete "$title"? This cannot be undone.',
           style: GoogleFonts.poppins(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(false),
             child: Text(
               'Cancel',
               style: GoogleFonts.poppins(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref.read(notesControllerProvider.notifier).deleteNote(note.id);
-            },
+            onPressed: () => Navigator.of(context).pop(true),
             child: Text(
               'Delete',
               style: GoogleFonts.poppins(
@@ -170,7 +185,87 @@ class _NoteCard extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Empty State Widget
+// Note Card (pure display, no gesture handling here)
+// ---------------------------------------------------------------------------
+class _NoteCard extends StatelessWidget {
+  const _NoteCard({required this.note});
+
+  final NoteModel note;
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormatted =
+        DateFormat('MMM d, yyyy • h:mm a').format(note.createdAt);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Swipe hint row
+            Row(
+              children: [
+                const Icon(Icons.swipe_rounded, size: 12, color: AppColors.textHint),
+                const SizedBox(width: 4),
+                Text(
+                  'Swipe right to edit  ·  left to delete',
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: AppColors.textHint,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              note.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              note.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Icon(
+                  Icons.access_time_rounded,
+                  size: 13,
+                  color: AppColors.textHint,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  dateFormatted,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppColors.textHint,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Empty State
 // ---------------------------------------------------------------------------
 class _EmptyState extends StatelessWidget {
   const _EmptyState();

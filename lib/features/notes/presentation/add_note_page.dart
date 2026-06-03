@@ -6,20 +6,27 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../auth/domain/auth_provider.dart';
+import '../domain/note_model.dart';
 import '../domain/notes_provider.dart';
 
 class AddNotePage extends HookConsumerWidget {
-  const AddNotePage({super.key});
+  // When [note] is non-null the page runs in Edit mode
+  const AddNotePage({super.key, this.note});
+
+  final NoteModel? note;
+
+  bool get _isEditing => note != null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(GlobalKey<FormState>.new);
-    final titleController = useTextEditingController();
-    final descriptionController = useTextEditingController();
+
+    final titleController = useTextEditingController(text: note?.title ?? '');
+    final descriptionController =
+        useTextEditingController(text: note?.description ?? '');
 
     final notesState = ref.watch(notesControllerProvider);
 
-    // Show error SnackBar if save fails
     ref.listen<NotesState>(notesControllerProvider, (_, next) {
       if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -34,18 +41,31 @@ class AddNotePage extends HookConsumerWidget {
     Future<void> onSave() async {
       if (!formKey.currentState!.validate()) return;
 
-      final user = ref.read(authStateProvider).value;
-      if (user == null) return;
+      bool success;
 
-      final success = await ref.read(notesControllerProvider.notifier).addNote(
-            title: titleController.text,
-            description: descriptionController.text,
-            userId: user.uid,
-          );
+      if (_isEditing) {
+        success = await ref.read(notesControllerProvider.notifier).updateNote(
+              noteId: note!.id,
+              title: titleController.text,
+              description: descriptionController.text,
+            );
+      } else {
+        final user = ref.read(authStateProvider).value;
+        if (user == null) return;
+        success = await ref.read(notesControllerProvider.notifier).addNote(
+              title: titleController.text,
+              description: descriptionController.text,
+              userId: user.uid,
+            );
+      }
 
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.noteSaved)),
+          SnackBar(
+            content: Text(
+              _isEditing ? AppStrings.noteUpdated : AppStrings.noteSaved,
+            ),
+          ),
         );
         context.pop();
       }
@@ -53,7 +73,7 @@ class AddNotePage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.addNote),
+        title: Text(_isEditing ? AppStrings.editNote : AppStrings.addNote),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => context.pop(),
@@ -66,7 +86,6 @@ class AddNotePage extends HookConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title field
               Text(
                 AppStrings.noteTitle,
                 style: GoogleFonts.poppins(
@@ -92,7 +111,6 @@ class AddNotePage extends HookConsumerWidget {
               ),
               const SizedBox(height: 20),
 
-              // Description field
               Text(
                 AppStrings.noteDescription,
                 style: GoogleFonts.poppins(
@@ -121,7 +139,6 @@ class AddNotePage extends HookConsumerWidget {
               ),
               const SizedBox(height: 36),
 
-              // Save button
               ElevatedButton(
                 onPressed: notesState.isLoading ? null : onSave,
                 child: notesState.isLoading
@@ -134,7 +151,11 @@ class AddNotePage extends HookConsumerWidget {
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(AppStrings.saveNote),
+                    : Text(
+                        _isEditing
+                            ? AppStrings.updateNote
+                            : AppStrings.saveNote,
+                      ),
               ),
             ],
           ),
