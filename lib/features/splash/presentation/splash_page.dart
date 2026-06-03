@@ -60,7 +60,7 @@ class SplashPage extends HookWidget {
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
+                            color: Colors.black.withValues(alpha: 0.15),
                             blurRadius: 24,
                             offset: const Offset(0, 8),
                           ),
@@ -86,7 +86,7 @@ class SplashPage extends HookWidget {
                     Text(
                       AppStrings.splashTagline,
                       style: GoogleFonts.poppins(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                       ),
@@ -98,7 +98,7 @@ class SplashPage extends HookWidget {
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.7),
+                          Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ),

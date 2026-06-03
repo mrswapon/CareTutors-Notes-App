@@ -7,15 +7,21 @@ class NotesRepository {
   NotesRepository({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  // Real-time stream of all notes for the given user, ordered newest-first
+  // Real-time stream of all notes for the given user, ordered newest-first.
+  // Sorting is done client-side to avoid requiring a Firestore composite index
+  // on (userId, createdAt). For large datasets, create the index instead:
+  // Firebase Console → Firestore → Indexes → Add composite index
+  // (userId ASC, createdAt DESC).
   Stream<List<NoteModel>> watchNotes(String userId) {
     return _firestore
         .collection('notes')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(NoteModel.fromFirestore).toList());
+        .map((snapshot) {
+      final notes = snapshot.docs.map(NoteModel.fromFirestore).toList();
+      notes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return notes;
+    });
   }
 
   Future<void> addNote(NoteModel note) async {
