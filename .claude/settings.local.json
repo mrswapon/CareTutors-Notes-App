@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\core\\\\constants\")",
+      "Bash(Out-Null)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\core\\\\router\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\core\\\\theme\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\auth\\\\data\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\auth\\\\domain\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\auth\\\\presentation\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\notes\\\\data\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\notes\\\\domain\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\notes\\\\presentation\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\lib\\\\features\\\\splash\\\\presentation\")",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\swapo\\\\StudioProjects\\\\caretutors_notes_app\\\\android\\\\app\")",
+      "Bash(mkdir -p C:/Users/swapo/StudioProjects/caretutors_notes_app/lib/core/constants)",
+      "Bash(mkdir -p C:/Users/swapo/StudioProjects/caretutors_notes_app/lib/core/router)",
+      "Bash(mkdir -p C:/Users/swapo/StudioProjects/caretutors_notes_app/lib/core/theme)",
+      "Bash(mkdir -p C:/Users/swapo/StudioProjects/caretutors_notes_app/lib/features/auth/data)",
+      "Bash(mkdir -p C:/Users/swapo/StudioProjects/caretutors_notes_app/lib/features/auth/domain)"
+    ]
+  }
+}

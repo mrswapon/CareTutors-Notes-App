@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "481338386862",
+    "project_id": "caretutors-notes-app-3060b",
+    "storage_bucket": "caretutors-notes-app-3060b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481338386862:android:37f85221d228a706b4803f",
+        "android_client_info": {
+          "package_name": "com.swapon.caretutors_notes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCugg7gPuCCbe24pYfCv0-fCw8oX6K6YM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
